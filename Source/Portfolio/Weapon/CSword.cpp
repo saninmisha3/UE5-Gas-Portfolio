@@ -1,17 +1,13 @@
 #include "CSword.h"
 #include "Global.h"
 #include "AbilitySystemComponent.h"
+#include "GAS/Attribute/CWeaponAttributeSet.h"
 #include "GameplayTagContainer.h"
 #include "GAS/GA/Sword.h"
+#include "DataAsset/CWeaponDataAsset.h"
 
 ACSword::ACSword()
 {
-	CHelpers::CreateSceneComponent(this, &RootComp, "RootComp");
-	CheckNull(RootComp);
-
-	CHelpers::CreateSceneComponent(this, &MeshComp, "MeshComp", RootComp);
-	CheckNull(MeshComp);
-
 	UStaticMesh* MeshAsset;
 	CHelpers::GetAsset(&MeshAsset, "/Game/Assets/KlianLowPoliSwords/Mesh/SM_LargeSword");
 	CheckNull(MeshAsset);
@@ -19,6 +15,7 @@ ACSword::ACSword()
 	MeshComp->SetStaticMesh(MeshAsset);
 
 	AttachSocketName = "hand_r_Sword";
+
 }
 
 void ACSword::BeginPlay()
@@ -30,6 +27,25 @@ void ACSword::BeginPlay()
 		FGameplayAbilitySpec AbilitySpec(USword::StaticClass());
 		WeaponAbilitySpec = AbilitySpec;
 		ASC->GiveAbility(AbilitySpec);
+	}
+
+	for (const auto& data : DataAsset->Datas)
+	{
+		if (GetClass() == data.WeaponClass)
+		{
+			Attribute->SetBaseDamage(data.BaseDamage);
+			Attribute->SetBaseProficiency(data.BaseProficiency);
+
+			Attribute->SetCurrentDamage(Attribute->GetBaseDamage());
+			Attribute->SetCurrentProficiency(0.f);
+
+			if(data.WeaponImage)
+				WeaponImage = data.WeaponImage;
+
+			if (data.WeaponName != NAME_None)
+				WeaponName = FText::FromString(data.WeaponName.ToString());
+			break;
+		}
 	}
 }
 

@@ -23,10 +23,24 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 public:
+	FORCEINLINE ACWeapon* GetCurrentCurrentEquipWeapon() { return CurrentEquipWeapon; }
+	FORCEINLINE ACWeapon** GetEquipWeapons() { return EquipWeapon; }
+
+public:
 	void Equip(int32 slot);
 	void Begin_Equip();
 
-	void MainAction();
+	void OnMainAction();
+	void OffMainAction();
+
+	void OnSubAction();
+	void OffSubAction();
+
+	void Reload();
+
+
+	UFUNCTION()
+		void UpdateProficiency(float NewValue);
 
 public:
 	UPROPERTY(EditDefaultsOnly, Category = "DataAsset")

@@ -23,8 +23,10 @@ EBTNodeResult::Type UCBTTaskNode_FlyingPatrol::ExecuteTask(UBehaviorTreeComponen
 	ACBoss* Boss = Cast<ACBoss>(AIC->GetPawn());
 	CheckNullResult(Boss, EBTNodeResult::Failed);
 
+	AIC->ClearFocus(EAIFocusPriority::Gameplay);
+
 	Boss->GetFloatingComp()->MaxSpeed = 800.f;
-	Boss->SetActorRotation(FRotator(0, FMath::RandRange(0, 360), 0));
+	Boss->SetActorRotation(FRotator(0, FMath::RandRange(0, 360), 0)); 
 
 	return EBTNodeResult::InProgress;
 }
@@ -39,5 +41,20 @@ void UCBTTaskNode_FlyingPatrol::TickTask(UBehaviorTreeComponent& OwnerComp, uint
 	ACBoss* Boss = Cast<ACBoss>(AIC->GetPawn());
 	CheckNull(Boss);
 
-	Boss->GetFloatingComp()->AddInputVector(FVector(Boss->GetActorForwardVector()));
+	Boss->GetFloatingComp()->AddInputVector(FVector(Boss->GetActorForwardVector())); 
+}
+
+EBTNodeResult::Type UCBTTaskNode_FlyingPatrol::AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
+{
+	Super::AbortTask(OwnerComp, NodeMemory);
+
+	ACEnemyController* AIC = Cast<ACEnemyController>(OwnerComp.GetAIOwner());
+	CheckNullResult(AIC, EBTNodeResult::Failed);
+
+	ACBoss* Boss = Cast<ACBoss>(AIC->GetPawn());
+	CheckNullResult(Boss, EBTNodeResult::Failed);
+	
+	Boss->GetFloatingComp()->StopMovementImmediately();
+
+	return EBTNodeResult::Aborted;
 }

@@ -4,11 +4,14 @@
 #include "GameplayTagContainer.h"
 #include "GameplayTagsManager.h"
 #include "Components/TextRenderComponent.h"
+#include "NavigationInvokerComponent.h"
 #include "CPetController.h"
 #include "GAS/GA/AI_Attack.h"
 #include "GAS/GA/AI_GetHit.h"
-#include "GAS/Attribute/CPetAttributeSet.h"
+#include "GAS/GA/AI_Dead.h"
+#include "GAS/Attribute/CAIAttributeSet.h"
 #include "DataAsset/CPetDataAsset.h"
+#include "Widget/CPetWidget.h"
 
 ACPet::ACPet()
 {
@@ -29,17 +32,23 @@ ACPet::ACPet()
 	TextComp->SetRelativeRotation(FRotator(0, 90, 0));
 	TextComp->SetHorizontalAlignment(EHTA_Center);
 
+	CHelpers::CreateActorComponent(this, &InvokerComp, "InvokerComp");
+	CheckNull(InvokerComp);
+
 	CHelpers::GetClass(&AnimClass, "/Game/Pet/ABP_CPet");
 	CheckNull(AnimClass);
 
 	ASC = CreateDefaultSubobject<UAbilitySystemComponent>("ASC");
 	CheckNull(ASC);
 
-	Attribute = CreateDefaultSubobject<UCPetAttributeSet>("Attribute");
-	CheckNull(Attribute);
+	AIAttribute = CreateDefaultSubobject<UCAIAttributeSet>("Attribute");
+	CheckNull(AIAttribute);
 
 	CHelpers::GetAsset(&DataAsset, "/Game/DataAsset/DA_Pet");
 	CheckNull(DataAsset);
+
+	CHelpers::GetClass(&PetWidgetClass, "/Game/Widget/BP_CPetWidget");
+	CheckNull(PetWidgetClass);
 }
 
 void ACPet::BeginPlay()
@@ -61,8 +70,22 @@ void ACPet::BeginPlay()
 	FGameplayAbilitySpec HitSpec(UAI_GetHit::StaticClass());
 	ASC->GiveAbility(HitSpec);
 
-	Attribute->SetBaseHealth(DataAsset->BaseHealth);
-	Attribute->SetBaseDamage(DataAsset->BaseDamage);
+	FGameplayAbilitySpec DeadSpec(UAI_Dead::StaticClass());
+	ASC->GiveAbility(DeadSpec);
+
+	if (AIAttribute && DataAsset)
+	{
+		AIAttribute->SetBaseHealth(DataAsset->BaseHealth);
+		AIAttribute->SetBaseDamage(DataAsset->BaseDamage);
+		AIAttribute->SetCurrentHealth(AIAttribute->GetBaseHealth());
+		AIAttribute->SetCurrentDamage(AIAttribute->GetBaseDamage());
+	}
+
+	PetWidget = CreateWidget<UCPetWidget>(GetWorld(), PetWidgetClass);
+	CheckNull(PetWidget);
+
+	PetWidget->AddToViewport();
+
 }
 
 void ACPet::Tick(float DeltaTime)

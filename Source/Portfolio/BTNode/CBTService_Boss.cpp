@@ -8,6 +8,7 @@
 #include "Enemy/CBoss.h"
 #include "Player/CPlayer.h"
 #include "Pet/CPet.h"
+#include "CAnimInstance.h"
 
 UCBTService_Boss::UCBTService_Boss()
 {
@@ -29,24 +30,51 @@ void UCBTService_Boss::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMe
 	ACPlayer* Player = Cast<ACPlayer>(AIC->GetBlackboardComponent()->GetValueAsObject("PlayerKey"));
 	ACPet* Pet = Cast<ACPet>(AIC->GetBlackboardComponent()->GetValueAsObject("PetKey"));
 
-	if (AIC->GetBlackboardComponent()->GetValueAsObject("AttackTargetKey")) // 플레이어가 감지가 되면
-	{
-		float DistanceToTarget = Boss->GetDistanceTo(Cast<AActor>(AIC->GetBlackboardComponent()->GetValueAsObject("AttackTargetKey")));
+	SetTarget(AIC, Boss, Player, Pet);
 
-		if (DistanceToTarget < 150.f)
+	if (AIC->GetBlackboardComponent()->GetValueAsObject("AttackTargetKey")) // 타깃이 감지되면
+	{
+		Boss->SetWidget(true);
+
+		UCAnimInstance* Anim = Cast<UCAnimInstance>(Boss->GetMesh()->GetAnimInstance());
+		CheckNull(Anim);
+
+		AActor* Target = Cast<AActor>(AIC->GetBlackboardComponent()->GetValueAsObject("AttackTargetKey"));
+		CheckNull(Target);
+
+		float DistanceToTarget = Boss->GetDistanceTo(Target);
+		float AttackRange = Anim->IsFly ? 3500.f : 1500.f;
+
+		if(DistanceToTarget < AttackRange)
 		{
-			Boss->GetTagContainer().AddTag(FGameplayTag::RequestGameplayTag(FName("AI.State.Attack")));
+			if (Boss->GetTagContainer().HasTag(FGameplayTag::RequestGameplayTag(FName("AI.Action.Patrol"))))
+				Boss->GetTagContainer().RemoveTag(FGameplayTag::RequestGameplayTag(FName("AI.Action.Patrol")));
+			if (Boss->GetTagContainer().HasTag(FGameplayTag::RequestGameplayTag(FName("AI.Action.Approach"))))
+				Boss->GetTagContainer().RemoveTag(FGameplayTag::RequestGameplayTag(FName("AI.Action.Approach")));
+			if (!Boss->GetTagContainer().HasTag(FGameplayTag::RequestGameplayTag(FName("AI.Action.Attack"))))
+				Boss->GetTagContainer().AddTag(FGameplayTag::RequestGameplayTag(FName("AI.Action.Attack")));
 		}
 		else
 		{
-			Boss->GetTagContainer().AddTag(FGameplayTag::RequestGameplayTag(FName("AI.State.Approach")));
+			if (Boss->GetTagContainer().HasTag(FGameplayTag::RequestGameplayTag(FName("AI.Action.Patrol"))))
+				Boss->GetTagContainer().RemoveTag(FGameplayTag::RequestGameplayTag(FName("AI.Action.Patrol")));
+			if (Boss->GetTagContainer().HasTag(FGameplayTag::RequestGameplayTag(FName("AI.Action.Attack"))))
+				Boss->GetTagContainer().RemoveTag(FGameplayTag::RequestGameplayTag(FName("AI.Action.Attack")));
+			if (!Boss->GetTagContainer().HasTag(FGameplayTag::RequestGameplayTag(FName("AI.Action.Approach"))))
+				Boss->GetTagContainer().AddTag(FGameplayTag::RequestGameplayTag(FName("AI.Action.Approach")));
 		}
 	}
 	else
 	{
-		Boss->GetTagContainer().AddTag(FGameplayTag::RequestGameplayTag("AI.State.Idle"));
+		Boss->SetWidget(false); // 여기 자꾸 왜 이러지
+
+		if(Boss->GetTagContainer().HasTag(FGameplayTag::RequestGameplayTag(FName("AI.Action.Approach"))))
+			Boss->GetTagContainer().RemoveTag(FGameplayTag::RequestGameplayTag(FName("AI.Action.Approach")));
+		if (Boss->GetTagContainer().HasTag(FGameplayTag::RequestGameplayTag(FName("AI.Action.Attack"))))
+			Boss->GetTagContainer().RemoveTag(FGameplayTag::RequestGameplayTag(FName("AI.Action.Attack")));
+		if (!Boss->GetTagContainer().HasTag(FGameplayTag::RequestGameplayTag(FName("AI.Action.Patrol"))))
+			Boss->GetTagContainer().AddTag(FGameplayTag::RequestGameplayTag(FName("AI.Action.Patrol")));
 	}
-	Boss->GetTagContainer().AddTag(FGameplayTag::RequestGameplayTag("AI.State.Idle"));
 }
 
 void UCBTService_Boss::SetTarget(ACEnemyController* AIC, ACBoss* Boss, ACPlayer* Player, ACPet* Pet)
@@ -54,12 +82,12 @@ void UCBTService_Boss::SetTarget(ACEnemyController* AIC, ACBoss* Boss, ACPlayer*
 	float DistanceToPlayer = 0.0f;
 	float DistanceToPet = 0.0f;
 
-	if (Player != nullptr)
+	if (Player != nullptr && !(Player->GetTagContainer().HasTag(FGameplayTag::RequestGameplayTag(FName("Character.State.Dead")))))
 	{
 		DistanceToPlayer = Boss->GetDistanceTo(Player);
 	}
 
-	if (Pet != nullptr)
+	if (Pet != nullptr && !(Pet->GetTagContainer().HasTag(FGameplayTag::RequestGameplayTag(FName("AI.Action.Dead")))))
 	{
 		DistanceToPet = Boss->GetDistanceTo(Pet);
 	}

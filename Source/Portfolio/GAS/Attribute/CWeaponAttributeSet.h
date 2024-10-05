@@ -13,19 +13,16 @@
 
 class UCWeaponDataAsset;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FUpdateProficiency, float, NewValue);
+
 UCLASS()
 class PORTFOLIO_API UCWeaponAttributeSet : public UAttributeSet
 {
 	GENERATED_BODY()
-	
-public:
-	UCWeaponAttributeSet();
 
 private:
     virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
     virtual void PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue) override;
-
-    virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
 
 public:
 	UPROPERTY(EditDefaultsOnly, Category = "GAS Attribute", meta = (AllowPrivateAccess = true))
@@ -44,7 +41,6 @@ public:
 		FGameplayAttributeData CurrentProficiency;
 	ATTRIBUTE_ACCESSORS(UCWeaponAttributeSet, CurrentProficiency);
 
-private:
-	bool IsBaseDamageSet;
-	bool IsBaseProficiencySet;
+public:
+	FUpdateProficiency OnUpdateProficiency;
 };

@@ -1,15 +1,8 @@
 #include "CWeaponAttributeSet.h"
 #include "Global.h"
+#include "Widget/CPlayerWidget.h"
+#include "Player/CPlayer.h"
 
-UCWeaponAttributeSet::UCWeaponAttributeSet()
-{
-	//if (IsBaseDamageSet && IsBaseProficiencySet)
-	//{
-	//	InitCurrentDamage(GetBaseDamage()); // current와 base값을 같게함
-	//	InitCurrentProficiency(GetBaseProficiency());
-	//}
-	
-}
 
 void UCWeaponAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
 {
@@ -18,10 +11,18 @@ void UCWeaponAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribut
 
 void UCWeaponAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue)
 {
+	if (Attribute == GetCurrentProficiencyAttribute())
+	{
+		ACPlayer* Player = Cast<ACPlayer>(GetOwningActor()->GetOwner());
+		CheckNull(Player);
 
-}
+		Player->GetPlayerWidget()->UpdateEquipWeaponProficiency(NewValue);
 
-void UCWeaponAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
-{
+		if (GetCurrentProficiency() >= GetBaseProficiency())
+		{
+			OnUpdateProficiency.Broadcast(NewValue);
+			SetCurrentProficiency(0.f);
 
+		}
+	}
 }

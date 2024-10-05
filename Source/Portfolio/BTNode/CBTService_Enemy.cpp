@@ -27,9 +27,15 @@ void UCBTService_Enemy::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 	CheckNull(Enemy);
 
 	ACPlayer* Player = Cast<ACPlayer>(AIC->GetBlackboardComponent()->GetValueAsObject("PlayerKey"));
+
 	ACPet* Pet = Cast<ACPet>(AIC->GetBlackboardComponent()->GetValueAsObject("PetKey"));
 
 	SetTarget(AIC, Enemy, Player, Pet);
+
+	if (Enemy->GetTagContainer().HasTag(FGameplayTag::RequestGameplayTag(FName("AI.Action.GetHit"))))
+	{
+		return;
+	}
 
 	if (AIC->GetBlackboardComponent()->GetValueAsObject("AttackTargetKey")) // 플레이어가 감지가 되면
 	{
@@ -37,21 +43,35 @@ void UCBTService_Enemy::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 
 		if (DistanceToTarget < 150.f)
 		{
-			Enemy->GetTagContainer().Reset();
-			Enemy->GetTagContainer().AddTag(FGameplayTag::RequestGameplayTag(FName("AI.State.Attack")));
+			if (Enemy->GetTagContainer().HasTag(FGameplayTag::RequestGameplayTag(FName("AI.Action.Patrol"))))
+				Enemy->GetTagContainer().RemoveTag(FGameplayTag::RequestGameplayTag(FName("AI.Action.Patrol")));
+			if (Enemy->GetTagContainer().HasTag(FGameplayTag::RequestGameplayTag(FName("AI.Action.Approach"))))
+				Enemy->GetTagContainer().RemoveTag(FGameplayTag::RequestGameplayTag(FName("AI.Action.Approach")));
+			if (!Enemy->GetTagContainer().HasTag(FGameplayTag::RequestGameplayTag(FName("AI.Action.Attack"))))
+				Enemy->GetTagContainer().AddTag(FGameplayTag::RequestGameplayTag(FName("AI.Action.Attack")));
 		}
 		else
 		{
-			Enemy->GetTagContainer().Reset();
-			Enemy->GetTagContainer().AddTag(FGameplayTag::RequestGameplayTag(FName("AI.State.Approach")));
+			if (Enemy->GetTagContainer().HasTag(FGameplayTag::RequestGameplayTag(FName("AI.Action.Patrol"))))
+				Enemy->GetTagContainer().RemoveTag(FGameplayTag::RequestGameplayTag(FName("AI.Action.Patrol")));
+			if (Enemy->GetTagContainer().HasTag(FGameplayTag::RequestGameplayTag(FName("AI.Action.Attack"))))
+				Enemy->GetTagContainer().RemoveTag(FGameplayTag::RequestGameplayTag(FName("AI.Action.Attack")));
+			if (!Enemy->GetTagContainer().HasTag(FGameplayTag::RequestGameplayTag(FName("AI.Action.Approach"))))
+				Enemy->GetTagContainer().AddTag(FGameplayTag::RequestGameplayTag(FName("AI.Action.Approach")));
 		}
 	}
 	else
 	{
-		Enemy->GetTagContainer().Reset();
-		Enemy->GetTagContainer().AddTag(FGameplayTag::RequestGameplayTag("AI.State.Idle"));
+		AIC->ClearFocus(EAIFocusPriority::Gameplay);
+
+		if (Enemy->GetTagContainer().HasTag(FGameplayTag::RequestGameplayTag(FName("AI.Action.Approach"))))
+			Enemy->GetTagContainer().RemoveTag(FGameplayTag::RequestGameplayTag(FName("AI.Action.Approach")));
+		if (Enemy->GetTagContainer().HasTag(FGameplayTag::RequestGameplayTag(FName("AI.Action.Attack"))))
+			Enemy->GetTagContainer().RemoveTag(FGameplayTag::RequestGameplayTag(FName("AI.Action.Attack")));
+		if (!Enemy->GetTagContainer().HasTag(FGameplayTag::RequestGameplayTag(FName("AI.Action.Patrol"))))
+			Enemy->GetTagContainer().AddTag(FGameplayTag::RequestGameplayTag(FName("AI.Action.Patrol")));
 	}
-	
+
 
 }
 
@@ -60,17 +80,17 @@ void UCBTService_Enemy::SetTarget(ACEnemyController* AIC, ACEnemy* Enemy, ACPlay
 	float DistanceToPlayer = 0.0f;
 	float DistanceToPet = 0.0f;
 
-	if (Player != nullptr)
+	if (Player != nullptr && !(Player->GetTagContainer().HasTag(FGameplayTag::RequestGameplayTag(FName("Character.State.Dead")))))
 	{
 		DistanceToPlayer = Enemy->GetDistanceTo(Player);
 	}
 
-	if (Pet != nullptr)
+	if (Pet != nullptr && !(Pet->GetTagContainer().HasTag(FGameplayTag::RequestGameplayTag(FName("AI.Action.Dead")))))
 	{
 		DistanceToPet = Enemy->GetDistanceTo(Pet);
 	}
 
-	if (DistanceToPlayer >= DistanceToPet)
+	if (DistanceToPlayer > DistanceToPet)
 	{
 		AIC->GetBlackboardComponent()->SetValueAsObject("AttackTargetKey", Player);
 	}

@@ -4,6 +4,8 @@
 #include "Abilities/GameplayAbility.h"
 #include "Rifle.generated.h"
 
+class UParticleSystem;
+
 UCLASS()
 class PORTFOLIO_API URifle : public UGameplayAbility
 {
@@ -16,4 +18,15 @@ public:
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 
 	virtual void CancelAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateCancelAbility) override;
+
+private:
+	void Shoot();
+
+private:
+	UAnimMontage* AttackAimMontage;
+	UAnimMontage* AttackHipMontage;
+	UParticleSystem* ImpactParticle;
+
+	FTimerHandle TimerHandle;
 };
+

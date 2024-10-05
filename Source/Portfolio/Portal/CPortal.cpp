@@ -5,12 +5,14 @@
 #include "Particles/ParticleSystem.h"
 #include "Blueprint/UserWidget.h" 
 #include "Widget/CPortalWidget.h"
+#include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "Blueprint/WidgetBlueprintLibrary.h"
 
 ACPortal::ACPortal()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	// Set Components
 	CHelpers::CreateSceneComponent(this, &MeshComp, "MeshComp");
 	CheckNull(MeshComp);
 
@@ -37,7 +39,6 @@ ACPortal::ACPortal()
 	ParticleComp->SetTemplate(Asset);
 	ParticleComp->SetRelativeScale3D(FVector(2.f));
 
-	// Set Widget
 	CHelpers::GetClass(&WidgetClass, "/Game/Widget/WB_CPortalWidget");
 	CheckNull(WidgetClass);
 
@@ -50,6 +51,8 @@ void ACPortal::BeginPlay()
 	OnActorBeginOverlap.AddDynamic(this, &ACPortal::BeginOverlap);
 
 	PortalWidget = CreateWidget<UCPortalWidget>(GetWorld(), WidgetClass);
+	CheckNull(PortalWidget);
+
 	PortalWidget->AddToViewport();
 	PortalWidget->SetVisibility(ESlateVisibility::Hidden);
 }
@@ -62,11 +65,23 @@ void ACPortal::Tick(float DeltaTime)
 
 void ACPortal::BeginOverlap(AActor* OverlappedActor, AActor* OtherActor)
 {
-	// ÇÃ·¹ÀÌ¾î ¸ØÃç¾ßµÊ
+	GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeUIOnly());
+
+	ACharacter* Character = Cast<ACharacter>(OtherActor);
+	CheckNull(Character);
+
+	Character->GetCharacterMovement()->SetActive(false);
+
+	TArray<UUserWidget*> Widgets;
+	UWidgetBlueprintLibrary::GetAllWidgetsOfClass(GetWorld(), Widgets, UUserWidget::StaticClass(), false);
+
+	for (const auto& Widget : Widgets)
+	{
+		Widget->SetVisibility(ESlateVisibility::Hidden);
+	}
+
 	PortalWidget->SetVisibility(ESlateVisibility::Visible);
 
-
-	GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeUIOnly());
-	
+	GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(true);
 }
 

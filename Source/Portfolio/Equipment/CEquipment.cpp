@@ -2,13 +2,18 @@
 #include "Global.h"
 #include "Player/CPlayer.h"
 #include "Weapon/CWeapon.h"
+#include "Weapon/CRifle.h"
 #include "AbilitySystemComponent.h"
 #include "GameplayTagContainer.h"
+#include "Widget/CPlayerWidget.h"
+#include "DataAsset/CWeaponDataAsset.h"
+#include "GAS/GA/ReloadRifle.h"
+#include "GAS/GA/Aim.h"
+#include "GAS/Attribute/CWeaponAttributeSet.h"
 
 ACEquipment::ACEquipment()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
 
 }
 
@@ -57,6 +62,11 @@ void ACEquipment::BeginPlay()
 		EquipWeapon[3]->SetActorHiddenInGame(true);
 	}
 
+
+	for (const auto& Weapon : EquipWeapon)
+	{
+		Weapon->GetAttiribute()->OnUpdateProficiency.AddDynamic(this, &ACEquipment::UpdateProficiency);
+	}
 }
 
 void ACEquipment::Tick(float DeltaTime)
@@ -69,43 +79,119 @@ void ACEquipment::Equip(int32 slot)
 {
 	CheckNull(EquipMontage);
 
+	if (CurrentEquipWeapon && CurrentEquipWeapon->IsA<ACRifle>())
+	{
+		CurrentEquipWeapon->GetAbilitySystemComponent()->CancelAbility(CurrentEquipWeapon->GetAbilitySystemComponent()->FindAbilitySpecFromClass(UAim::StaticClass())->Ability);
+	}
+
 	OwnerCharacter->PlayAnimMontage(EquipMontage);
 
 	NewWeapon = EquipWeapon[slot - 1];
 
-	
-	// 위젯 변화
-	// 무기 장착중인지 아닌지?
+	if (NewWeapon == CurrentEquipWeapon)
+	{
+		OwnerCharacter->GetPlayerWidget()->UpdateEquipWeaponImage(nullptr);
+		OwnerCharacter->GetPlayerWidget()->UpdateEquipWeaponName(FText());
+		OwnerCharacter->GetPlayerWidget()->UpdateEquipWeaponProficiency(0.f);
+		OwnerCharacter->GetPlayerWidget()->ShowCurrentBullet(false);
+		return;
+	}
+	else
+	{
+		OwnerCharacter->GetPlayerWidget()->UpdateEquipWeaponImage(NewWeapon->GetWeaponImage());
+		OwnerCharacter->GetPlayerWidget()->UpdateEquipWeaponName(NewWeapon->GetWeaponName());
+		OwnerCharacter->GetPlayerWidget()->UpdateEquipWeaponProficiency(NewWeapon->GetAttiribute()->GetCurrentProficiency());
+	}
+
+	if (NewWeapon->IsA<ACRifle>())
+	{
+		ACRifle* Rifle = Cast<ACRifle>(NewWeapon);
+		CheckNull(Rifle);
+
+		OwnerCharacter->GetPlayerWidget()->ShowCurrentBullet(true);
+		OwnerCharacter->GetPlayerWidget()->UpdateBaseBullet(Rifle->GetBaseBullet());
+		OwnerCharacter->GetPlayerWidget()->UpdateCurrentBullet(Rifle->GetCurrentBullet());
+	}
+	else
+		OwnerCharacter->GetPlayerWidget()->ShowCurrentBullet(false);
+
+	// 우클릭 풀어야됨
+	// todo.. 현재 장비해제하면 위젯도 아무것도 없게 만들어야함
 }
 
 void ACEquipment::Begin_Equip()
 {
-	// 무기 손 소켓에 붙이기
 	CheckNull(NewWeapon);
 
 	if (CurrentEquipWeapon)
 	{
 		CurrentEquipWeapon->SetActorHiddenInGame(true);
 		CurrentEquipWeapon->DetachFromActor(FDetachmentTransformRules::KeepRelativeTransform);
+		OwnerCharacter->GetTagContainer().RemoveTag(*(CurrentEquipWeapon->GetTag()));
+
+		if (CurrentEquipWeapon == NewWeapon)
+		{
+			CurrentEquipWeapon = nullptr;
+			return;
+		}
+
 		CurrentEquipWeapon = nullptr;
 
-		// OwnerCharacter->GetTagContainer().RemoveTag((FGameplayTag::RequestGameplayTag(FName(CurrentEquipWeapon->GetTag()->ToString()))));
 	}
 
-	NewWeapon->SetActorHiddenInGame(false); 
+	NewWeapon->SetActorHiddenInGame(false);
 	NewWeapon->AttachToComponent(OwnerCharacter->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, NewWeapon->GetSocketName());
 
-	CurrentEquipWeapon = NewWeapon;
+	OwnerCharacter->GetTagContainer().AddTag(*(NewWeapon->GetTag()));
 
-	// OwnerCharacter->GetTagContainer().AddTag((FGameplayTag::RequestGameplayTag(FName(NewWeapon->GetTag()->ToString()))));
+	CurrentEquipWeapon = NewWeapon;
 }
 
-void ACEquipment::MainAction()
+void ACEquipment::OnMainAction()
 {
 	CheckNull(CurrentEquipWeapon);
 
 	CurrentEquipWeapon->GetAbilitySystemComponent()->TryActivateAbility(CurrentEquipWeapon->GetWeaponAbilitySpec().Handle);
 
-	// 스테미너 감소
+	// todo.. 총제외 스테미너 감소
 }
 
+void ACEquipment::OffMainAction()
+{
+	CheckNull(CurrentEquipWeapon); 
+
+	CurrentEquipWeapon->GetAbilitySystemComponent()->CancelAbilityHandle(CurrentEquipWeapon->GetWeaponAbilitySpec().Handle);
+}
+
+
+
+void ACEquipment::OnSubAction()
+{
+	CheckNull(CurrentEquipWeapon);
+
+	CurrentEquipWeapon->GetAbilitySystemComponent()->TryActivateAbility(CurrentEquipWeapon->GetWeaponSubAbilitySpec().Handle);
+
+}
+
+void ACEquipment::OffSubAction()
+{
+	CheckNull(CurrentEquipWeapon);
+	
+	// todo.. 여기 서브능력 진행중인지 아닌지 검사하는 조건 추가해야할듯
+	CurrentEquipWeapon->GetAbilitySystemComponent()->CancelAbilityHandle(CurrentEquipWeapon->GetWeaponSubAbilitySpec().Handle);
+}
+
+void ACEquipment::Reload()
+{
+	CheckNull(CurrentEquipWeapon);
+
+	if (CurrentEquipWeapon->GetWeaponName().ToString() == "Rifle")
+	{
+		CurrentEquipWeapon->GetAbilitySystemComponent()->TryActivateAbility(CurrentEquipWeapon->GetAbilitySystemComponent()->FindAbilitySpecFromClass(UReloadRifle::StaticClass())->Handle);
+	}
+}
+
+void ACEquipment::UpdateProficiency(float NewValue)
+{
+	// OwnerCharacter->
+}

@@ -4,18 +4,19 @@
 #include "AbilitySystemInterface.h"
 #include "GameplayTagContainer.h"
 #include "GameFramework/Character.h"
+#include "Interface/CAIInterface.h"
 #include "CEnemy.generated.h"
 
 class UTextRenderComponent;
 class UWidgetComponent;
 class UAbilitySystemComponent;
+class UNavigationInvokerComponent;
 class UBehaviorTree;
-class UCMonsterMeshDataAsset;
-class UCMonsterAttributeSet;
-class UCEnemyHealthWidget;
+class UCAIAttributeSet;
+class UCDamageWidget;
 
 UCLASS()
-class PORTFOLIO_API ACEnemy : public ACharacter, public IAbilitySystemInterface
+class PORTFOLIO_API ACEnemy : public ACharacter, public IAbilitySystemInterface, public ICAIInterface
 {
 	GENERATED_BODY()
 
@@ -29,22 +30,32 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 public:
+	UFUNCTION()
+	virtual void BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	virtual FGameplayTagContainer& GetTagContainer() override { return TagContainer; }
+	virtual UCAIAttributeSet* GetAIAttributeSet() override { return AIAttribute; }
+	virtual UWidgetComponent* GetDamageTextComponent() override { return DamageTextComp; }
 
 	UBehaviorTree* GetBehaviorTree() { return BT; }
 
-	FORCEINLINE virtual UCEnemyHealthWidget* GetHealthWidget() { return HealthWidgetObject; }
-	FORCEINLINE virtual FGameplayTagContainer& GetTagContainer() { return TagContainer; }
-	FORCEINLINE virtual UCMonsterAttributeSet* GetAttributeSet() { return Attribute; }
-	FORCEINLINE virtual UCMonsterMeshDataAsset* GetDataAsset() { return DataAsset; }
-	FORCEINLINE virtual int32 GetIndex() { return Index; }
+	UFUNCTION()
+		void SetDamageText(float NewValue);
+
+	void HiddenDamage();
+
+	void Dead();
 
 protected:
-	UPROPERTY(EditDefaultsOnly, Category = "Text")
+	UPROPERTY(EditDefaultsOnly, Category = "Component")
 		UTextRenderComponent* TextComp;
 
-	UPROPERTY(VisibleDefaultsOnly, Category = "Components")
-		UWidgetComponent* HealthWidgetComp;
+	UPROPERTY(EditDefaultsOnly, Category = "Component")
+		UWidgetComponent* DamageTextComp;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Component")
+		UNavigationInvokerComponent* InvokerComp;
 
 	UPROPERTY(EditDefaultsOnly, Category = "GAS")
 		TObjectPtr<UAbilitySystemComponent> ASC;
@@ -56,12 +67,8 @@ protected:
 		FGameplayTagContainer TagContainer;
 
 	UPROPERTY(EditDefaultsOnly, Category = "GAS")
-		TObjectPtr<UCMonsterAttributeSet> Attribute;
-
+		TObjectPtr<UCAIAttributeSet> AIAttribute;
+	
 protected:
-	UCMonsterMeshDataAsset* DataAsset;
-	int32 Index;
-
-public:
-	UCEnemyHealthWidget* HealthWidgetObject;
+	TSubclassOf<UCDamageWidget> DamageWidgetClass;	
 };

@@ -1,12 +1,10 @@
 #include "CBTTaskNode_Attack.h"
 #include "Global.h"
-#include "BehaviorTree/BehaviorTree.h"
-#include "Pet/CPetController.h"
-#include "Pet/CPet.h"
-#include "Enemy/CEnemyController.h"
-#include "Enemy/CEnemy.h"
+#include "AIController.h"
+#include "AbilitySystemInterface.h"
 #include "AbilitySystemComponent.h"
 #include "GAS/GA/AI_Attack.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
 UCBTTaskNode_Attack::UCBTTaskNode_Attack()
 {
@@ -19,40 +17,18 @@ EBTNodeResult::Type UCBTTaskNode_Attack::ExecuteTask(UBehaviorTreeComponent& Own
 {
 	Super::ExecuteTask(OwnerComp, NodeMemory);
 
-	// 일단 여기서 GA를 발동시키는걸 우선적으로.
-	if (OwnerComp.GetRootTree()->GetName() == FName("BT_Pet").ToString())
+	if (OwnerComp.GetAIOwner()->GetPawn()->GetClass()->ImplementsInterface(UAbilitySystemInterface::StaticClass()))
 	{
-		ACPetController* AIC = Cast<ACPetController>(OwnerComp.GetAIOwner());
-		if (AIC)
-		{
-			ACPet* Pet = Cast<ACPet>(AIC->GetPawn());
-			if (Pet)
-			{
-				if (Pet->GetAbilitySystemComponent())
-				{
-					
-					Pet->GetAbilitySystemComponent()->TryActivateAbility(Pet->GetAbilitySystemComponent()->FindAbilitySpecFromClass(UAI_Attack::StaticClass())->Handle);
-					return EBTNodeResult::InProgress;
-				}
-			}
-		}
+		IAbilitySystemInterface* ASI = Cast<IAbilitySystemInterface>(OwnerComp.GetAIOwner()->GetPawn());
+		CheckNullResult(ASI, EBTNodeResult::Failed);
+
+		OwnerComp.GetAIOwner()->SetFocus(Cast<AActor>(OwnerComp.GetAIOwner()->GetBlackboardComponent()->GetValueAsObject("AttackTargetKey")));
+
+		ASI->GetAbilitySystemComponent()->TryActivateAbility(ASI->GetAbilitySystemComponent()->FindAbilitySpecFromClass(UAI_Attack::StaticClass())->Handle);
+
+		return EBTNodeResult::InProgress;
 	}
-	else if (OwnerComp.GetRootTree()->GetName() == FName("BT_Enemy").ToString())
-	{
-		ACEnemyController* AIC = Cast<ACEnemyController>(OwnerComp.GetAIOwner());
-		if (AIC)
-		{
-			ACEnemy* Enemy = Cast<ACEnemy>(AIC->GetPawn());
-			if (Enemy)
-			{
-				if (Enemy->GetAbilitySystemComponent())
-				{
-					Enemy->GetAbilitySystemComponent()->TryActivateAbility(Enemy->GetAbilitySystemComponent()->FindAbilitySpecFromClass(UAI_Attack::StaticClass())->Handle);
-					return EBTNodeResult::InProgress;
-				}
-			}
-		}
-	}
+
 	return EBTNodeResult::Failed;
 }
 
@@ -60,44 +36,38 @@ void UCBTTaskNode_Attack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Nod
 {
 	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
 
-	if (OwnerComp.GetRootTree()->GetName() == FName("BT_Pet").ToString())
+	if (OwnerComp.GetAIOwner()->GetPawn()->GetClass()->ImplementsInterface(UAbilitySystemInterface::StaticClass()))
 	{
-		ACPetController* AIC = Cast<ACPetController>(OwnerComp.GetAIOwner());
-		if (AIC)
+		IAbilitySystemInterface* ASI = Cast<IAbilitySystemInterface>(OwnerComp.GetAIOwner()->GetPawn());
+		CheckNull(ASI);
+
+		if (!ASI->GetAbilitySystemComponent()->GetCurrentMontage())
 		{
-			ACPet* Pet = Cast<ACPet>(AIC->GetPawn());
-			if (Pet)
-			{
-				if (Pet->GetAbilitySystemComponent())
-				{
-					
-					if (!Pet->GetAbilitySystemComponent()->GetCurrentMontage())
-					{
-						Pet->GetAbilitySystemComponent()->CancelAbilityHandle(Pet->GetAbilitySystemComponent()->FindAbilitySpecFromClass(UAI_Attack::StaticClass())->Handle);
-						FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
-					}
-				}
-			}
+			ASI->GetAbilitySystemComponent()->CancelAbilityHandle(ASI->GetAbilitySystemComponent()->FindAbilitySpecFromClass(UAI_Attack::StaticClass())->Handle);
+			FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 		}
 	}
-	else if (OwnerComp.GetRootTree()->GetName() == FName("BT_Enemy").ToString())
-	{
-		ACEnemyController* AIC = Cast<ACEnemyController>(OwnerComp.GetAIOwner());
-		if (AIC)
-		{
-			ACEnemy* Enemy = Cast<ACEnemy>(AIC->GetPawn());
-			if (Enemy)
-			{
-				if (Enemy->GetAbilitySystemComponent())
-				{
-					if (!Enemy->GetAbilitySystemComponent()->GetCurrentMontage())
-					{
-						Enemy->GetAbilitySystemComponent()->CancelAbilityHandle(Enemy->GetAbilitySystemComponent()->FindAbilitySpecFromClass(UAI_Attack::StaticClass())->Handle);
-						FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
-					}
-				}
-			}
-		}
-	}
-	
 }
+
+EBTNodeResult::Type UCBTTaskNode_Attack::AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
+{
+	Super::AbortTask(OwnerComp, NodeMemory);
+
+	if (OwnerComp.GetAIOwner()->GetPawn()->GetClass()->ImplementsInterface(UAbilitySystemInterface::StaticClass()))
+	{
+		IAbilitySystemInterface* ASI = Cast<IAbilitySystemInterface>(OwnerComp.GetAIOwner()->GetPawn());
+		CheckNullResult(ASI, EBTNodeResult::Failed);
+		
+		if (ASI->GetAbilitySystemComponent()->GetCurrentMontage())
+		{
+			OwnerComp.GetAIOwner()->ClearFocus(EAIFocusPriority::Default);
+
+			ASI->GetAbilitySystemComponent()->CurrentMontageStop();
+			ASI->GetAbilitySystemComponent()->CancelAbilityHandle(ASI->GetAbilitySystemComponent()->FindAbilitySpecFromClass(UAI_Attack::StaticClass())->Handle);
+
+			return EBTNodeResult::Aborted;
+		}
+	}
+	return EBTNodeResult::Failed;
+}
+

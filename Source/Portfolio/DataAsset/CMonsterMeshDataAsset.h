@@ -5,6 +5,7 @@
 #include "CMonsterMeshDataAsset.generated.h"
 
 class UCAnimInstance;
+class ACItem;
 
 USTRUCT(BlueprintType)
 struct FMontageData
@@ -16,10 +17,11 @@ public:
 	TArray<TObjectPtr<UAnimMontage>> AttackMontage;
 
 	UPROPERTY(EditAnywhere)
-	TObjectPtr<UAnimMontage> HittedMontage;
+	TObjectPtr<UAnimMontage> DeadMontage;
 
 	UPROPERTY(EditAnywhere)
-	TObjectPtr<UAnimMontage> DeadMontage;
+	TObjectPtr<UAnimMontage> HittedMontage;
+
 };
 
 USTRUCT(BlueprintType)
@@ -44,7 +46,7 @@ public:
 		float BaseDamage;
 
 	UPROPERTY(EditAnywhere)
-		AActor* DropEmitter;
+		TArray<TSubclassOf<ACItem>> DropItems;
 };
 
 

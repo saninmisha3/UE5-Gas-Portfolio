@@ -5,6 +5,7 @@
 #include "CGameModeBase.generated.h"
 
 class ACSpawner;
+class ACBGMManager;
 
 UCLASS()
 class PORTFOLIO_API ACGameModeBase : public AGameModeBase
@@ -19,7 +20,7 @@ private:
 
 public:
 	void Spawn();
-	void Teleport();
+	void Teleport(FName Area);
 	void SetPlayerArea(AActor* OtherActor);
 
 private:
@@ -29,4 +30,9 @@ private:
 	FTimerHandle SpawnTimer;
 	FName PlayerArea;
 	
+	TArray<AActor*> TargetPointActors;
+
+	FString TargetPointName[5];
+
+	ACBGMManager* BGMManager;
 };

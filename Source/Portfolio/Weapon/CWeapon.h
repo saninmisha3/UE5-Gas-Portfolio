@@ -4,15 +4,19 @@
 #include "GameFramework/Actor.h"
 #include "AbilitySystemInterface.h"
 #include "AbilitySystemComponent.h"
+#include "Interface/CAttackCompInterface.h"
 #include "GameplayTagContainer.h"
 #include "CWeapon.generated.h"
 
 class UAttributeSet;
 class UCWeaponAttributeSet;
 class UCWeaponDataAsset;
+class UTexture;
+class UBoxComponent;
+class UGameplayEffect;
 
 UCLASS()
-class PORTFOLIO_API ACWeapon : public AActor, public IAbilitySystemInterface
+class PORTFOLIO_API ACWeapon : public AActor, public IAbilitySystemInterface, public ICAttackCompInterface
 {
 	GENERATED_BODY()
 	
@@ -25,12 +29,27 @@ protected:
 public:	
 	virtual void Tick(float DeltaTime) override;
 
+protected:
+	UFUNCTION()
+	virtual void BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
 public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	virtual UCWeaponAttributeSet* GetAttiribute() { return Attribute; }
 	virtual FGameplayTag* GetTag() { return &Tag; }
 	virtual FName GetSocketName() { return AttachSocketName; }
 	virtual FGameplayAbilitySpec GetWeaponAbilitySpec() { return WeaponAbilitySpec;}
+	virtual FGameplayAbilitySpec GetWeaponSubAbilitySpec() { return WeaponSubAbilitySpec; }
+	virtual UCWeaponDataAsset* GetDataAsset() { return DataAsset; }
+	virtual UTexture* GetWeaponImage() { return WeaponImage; }
+	virtual FText GetWeaponName() { return WeaponName; }
+
+	virtual UBoxComponent* GetAttackComp() override { return AttackCollisionComp; }
+
+	virtual void OnDamageBuff();
+
+	UFUNCTION()
+		void UpdateProficiency(float NewValue);
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Component")
@@ -38,6 +57,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Component")
 		UStaticMeshComponent* MeshComp;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Component")
+		UBoxComponent* AttackCollisionComp;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Socket")
 		FName AttachSocketName;
@@ -51,7 +73,21 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "GAS")
 		FGameplayTag Tag;
 
+	UPROPERTY(EditDefaultsOnly, Category = "GAS")
+		TSubclassOf<UGameplayEffect> BPDamageBuffEffect;
+
+	UPROPERTY(EditDefaultsOnly, Category = "GAS")
+		TSubclassOf<UGameplayEffect> BPProficencyEffect;
+
 protected:
 	UCWeaponDataAsset* DataAsset;
 	FGameplayAbilitySpec WeaponAbilitySpec;
+	FGameplayAbilitySpec WeaponSubAbilitySpec;
+
+	UTexture* WeaponImage;
+	FText WeaponName;
+	float Proficiency;
+
+	FGameplayEffectSpecHandle DamageBuffEffectHandle;
+	FGameplayEffectSpecHandle ProficiencyEffectHandle;
 };
