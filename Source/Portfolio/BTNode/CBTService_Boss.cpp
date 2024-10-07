@@ -32,8 +32,7 @@ void UCBTService_Boss::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMe
 
 	SetTarget(AIC, Boss, Player, Pet);
 
-	if (AIC->GetBlackboardComponent()->GetValueAsObject("AttackTargetKey")) // 타깃이 감지되면
-	{
+	if (AIC->GetBlackboardComponent()->GetValueAsObject("AttackTargetKey")) 	{
 		Boss->SetWidget(true);
 
 		UCAnimInstance* Anim = Cast<UCAnimInstance>(Boss->GetMesh()->GetAnimInstance());
@@ -66,8 +65,7 @@ void UCBTService_Boss::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMe
 	}
 	else
 	{
-		Boss->SetWidget(false); // 여기 자꾸 왜 이러지
-
+		Boss->SetWidget(false); 
 		if(Boss->GetTagContainer().HasTag(FGameplayTag::RequestGameplayTag(FName("AI.Action.Approach"))))
 			Boss->GetTagContainer().RemoveTag(FGameplayTag::RequestGameplayTag(FName("AI.Action.Approach")));
 		if (Boss->GetTagContainer().HasTag(FGameplayTag::RequestGameplayTag(FName("AI.Action.Attack"))))

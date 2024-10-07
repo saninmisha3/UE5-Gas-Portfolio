@@ -47,13 +47,11 @@ void UCInventory::SetOwner(ACPlayer* InOwner)
 void UCInventory::AddItemToInventory(const FItemDataTable Row)
 {
 	if (ItemDatas.IsEmpty())
-		PrintLine(); // 대체 왜걸림?
-
+		PrintLine(); 
 
 	if (Row.Name.IsValid())
 	{
-		if (ItemDatas.Contains(Row.Name)) // 동일한 값이 있으면
-		{
+		if (ItemDatas.Contains(Row.Name)) 		{
 			int32* Count = ItemCount.Find(Row.Name);
 
 			++(*Count); 
@@ -61,8 +59,7 @@ void UCInventory::AddItemToInventory(const FItemDataTable Row)
 			CLog::Print(*Count);
 			ItemCount.Emplace(Row.Name, *Count);
 		}
-		else // 동일한 값이 없으면 = 새로운 값이면
-		{
+		else 		{
 			int32 Count = 1;
 
 			ItemDatas.Emplace(Row.Name, Row);

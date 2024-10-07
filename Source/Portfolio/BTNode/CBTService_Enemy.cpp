@@ -37,8 +37,7 @@ void UCBTService_Enemy::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 		return;
 	}
 
-	if (AIC->GetBlackboardComponent()->GetValueAsObject("AttackTargetKey")) // 플레이어가 감지가 되면
-	{
+	if (AIC->GetBlackboardComponent()->GetValueAsObject("AttackTargetKey")) 	{
 		float DistanceToTarget = Enemy->GetDistanceTo(Cast<AActor>(AIC->GetBlackboardComponent()->GetValueAsObject("AttackTargetKey")));
 
 		if (DistanceToTarget < 150.f)

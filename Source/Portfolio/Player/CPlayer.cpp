@@ -28,8 +28,7 @@ ACPlayer::ACPlayer()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	// Set SkeletalMesh
-	USkeletalMesh* MeshAsset;
+		USkeletalMesh* MeshAsset;
 	CHelpers::GetAsset(&MeshAsset, "/Game/Assets/CR/LQ/Modular_001_Bergs10/Mesh/SKM_Bergs10_1");
 	CheckNull(MeshAsset);
 
@@ -37,8 +36,7 @@ ACPlayer::ACPlayer()
 	GetMesh()->SetRelativeLocation(FVector(0, 0, -88));
 	GetMesh()->SetRelativeRotation(FRotator(0, -90, 0));
 
-	// Set Components
-	CHelpers::CreateSceneComponent(this, &SpringArmComp, "SpringArmComp", GetMesh());
+		CHelpers::CreateSceneComponent(this, &SpringArmComp, "SpringArmComp", GetMesh());
 	CheckNull(SpringArmComp);
 
 	SpringArmComp->TargetArmLength = 200.f;
@@ -61,20 +59,16 @@ ACPlayer::ACPlayer()
 	TextComp->SetRelativeRotation(FRotator(0, -90, 0));
 	TextComp->SetHorizontalAlignment(EHTA_Center);
 
-	GetCharacterMovement()->MaxWalkSpeed = 400.f; // 나중에 수정해야 함 이렇게 설정안할꺼임
-	GetCharacterMovement()->RotationRate = FRotator(0, 720, 0);
+	GetCharacterMovement()->MaxWalkSpeed = 400.f; 	GetCharacterMovement()->RotationRate = FRotator(0, 720, 0);
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 
-	// Set AnimClass
-	CHelpers::GetClass(&AnimClass, "/Game/Player/ABP_CPlayer");
+		CHelpers::GetClass(&AnimClass, "/Game/Player/ABP_CPlayer");
 	CheckNull(AnimClass);
 
-	// Set WidgetClass
-	CHelpers::GetClass(&WidgetClass, "/Game/Widget/BP_CPlayerWidget");
+		CHelpers::GetClass(&WidgetClass, "/Game/Widget/BP_CPlayerWidget");
 	CheckNull(WidgetClass);
 
-	// Set GAS
-	ASC = CreateDefaultSubobject<UAbilitySystemComponent>("ASC");
+		ASC = CreateDefaultSubobject<UAbilitySystemComponent>("ASC");
 	CheckNull(ASC);
 
 	AttributeSet = CreateDefaultSubobject<UCCharacterAttributeSet>("AttributeSet");
@@ -114,8 +108,7 @@ void ACPlayer::BeginPlay()
 
 	if (ASC)
 	{
-		ASC->InitAbilityActorInfo(this, this); // 반드시 호출해야함 
-		SetGAS();
+		ASC->InitAbilityActorInfo(this, this); 		SetGAS();
 	}
 	
 	CheckNull(AttributeSet);
@@ -146,8 +139,7 @@ void ACPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (TagContainer.HasTag(FGameplayTag::RequestGameplayTag(FName("Character.State.Idle")))) // 아무것도 안하고 있을 때
-	{
+	if (TagContainer.HasTag(FGameplayTag::RequestGameplayTag(FName("Character.State.Idle")))) 	{
 		if (AttributeSet->GetCurrentStamina() < AttributeSet->GetBaseStamina())
 			ASC->ApplyGameplayEffectSpecToSelf(*RegenerateStminaHandle.Data.Get());
 	}
@@ -160,8 +152,7 @@ void ACPlayer::Tick(float DeltaTime)
 		}
 	}
 
-	if (TagContainer.HasTag(FGameplayTag::RequestGameplayTag(FName("Character.Action.Sub.Aim")))) // 아무것도 안하고 있을 
-	{
+	if (TagContainer.HasTag(FGameplayTag::RequestGameplayTag(FName("Character.Action.Sub.Aim")))) 	{
 		GetSpringArmComp()->TargetArmLength = 100.f;
 		SetUsePawnControlRotation(false);
 	}
@@ -173,8 +164,7 @@ void ACPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &ACPlayer::OnMoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ACPlayer::OnMoveRight);
-	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput); // todo.. 수정할 예정, 옵션에서 설정가능하게
-	PlayerInputComponent->BindAxis("Lookup", this, &APawn::AddControllerPitchInput);
+	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput); 	PlayerInputComponent->BindAxis("Lookup", this, &APawn::AddControllerPitchInput);
 
 	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &ACPlayer::OnSprint); 
 	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &ACPlayer::OffSprint);
@@ -256,9 +246,7 @@ void ACPlayer::OnSprint()
 		TagContainer.AddTag(FGameplayTag::RequestGameplayTag(FName("Character.State.Sprint")));
 	}
 	
-	// todo.. 어빌리티있는지 확인
-	ASC->TryActivateAbility(ASC->FindAbilitySpecFromClass(USprint::StaticClass())->Handle); // todo.. 스테미너 조건 검사
-}
+		ASC->TryActivateAbility(ASC->FindAbilitySpecFromClass(USprint::StaticClass())->Handle); }
 
 void ACPlayer::OffSprint()
 {
@@ -309,14 +297,12 @@ void ACPlayer::OnEquipLastSlot()
 
 void ACPlayer::OnMainAction()
 {
-	// SetUsePawnControlRotation(false); //  todo.. 아무것도 안들때도 되어버림
-	Equipment->OnMainAction();
+		Equipment->OnMainAction();
 }
 
 void ACPlayer::OffMainAction()
 {
-	// SetUsePawnControlRotation(true);
-	Equipment->OffMainAction();
+		Equipment->OffMainAction();
 }
 
 void ACPlayer::OnSubAction()

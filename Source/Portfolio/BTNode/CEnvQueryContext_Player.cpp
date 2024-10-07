@@ -12,8 +12,7 @@ void UCEnvQueryContext_Player::ProvideContext(FEnvQueryInstance& QueryInstance, 
 	Super::ProvideContext(QueryInstance, ContextData);
 
 	ACharacter* Querier = Cast<ACharacter>(QueryInstance.Owner.Get());
-	if (Querier && Querier->GetController() && Cast<AAIController>(Querier->GetController())) // 컨트롤러의 블랙보드에 읽힌 플레이어 리턴
-	{
+	if (Querier && Querier->GetController() && Cast<AAIController>(Querier->GetController())) 	{
 		AAIController* AIC = Cast<AAIController>(Querier->GetController());
 		if (AIC->GetBlackboardComponent())
 		{

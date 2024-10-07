@@ -26,8 +26,7 @@ void UReloadRifle::CancelAbility(const FGameplayAbilitySpecHandle Handle, const 
 	ACRifle* Rifle = Cast<ACRifle>(ActorInfo->AvatarActor);
 	CheckNull(Rifle);
 
-	Rifle->Reload(); // 30¹ß ÃæÀü
-
+	Rifle->Reload(); 
 	Super::CancelAbility(Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility);
 }
 

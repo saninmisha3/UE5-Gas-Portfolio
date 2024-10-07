@@ -28,15 +28,12 @@ void UHookGun::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FG
 		return;
 	}
 
-	Player->PlayAnimMontage(AttackMontage); // 발사 몽타주
-
-	if (!GetWorld()->GetTimerManager().IsTimerActive(TraceTimerHandle)) // 0.1초마다 실행.
-	{
+	Player->PlayAnimMontage(AttackMontage); 
+	if (!GetWorld()->GetTimerManager().IsTimerActive(TraceTimerHandle)) 	{
 		GetWorld()->GetTimerManager().SetTimer(TraceTimerHandle, this, &UHookGun::FireHook, 0.05f, true);
 	}
 
-	if (!GetWorld()->GetTimerManager().IsTimerActive(EndTimerHandle)) // 1초뒤에 어빌리티 종료.
-	{
+	if (!GetWorld()->GetTimerManager().IsTimerActive(EndTimerHandle)) 	{
 		GetWorld()->GetTimerManager().SetTimer(EndTimerHandle, this, &UHookGun::FireEnd, 1.f, false);
 	}
 
@@ -45,8 +42,7 @@ void UHookGun::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FG
 
 void UHookGun::CancelAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateCancelAbility)
 {
-	if (GetWorld()->GetTimerManager().IsTimerActive(TraceTimerHandle)) return; // 마우스로 종료되는거 막기 위함. 이 어빌리티는 어빌리티 자체에서 실패판단할 것임.
-	
+	if (GetWorld()->GetTimerManager().IsTimerActive(TraceTimerHandle)) return; 	
 	ACHookGun* HookGun = Cast<ACHookGun>(GetOwningActorFromActorInfo());
 	CheckNull(HookGun);
 
@@ -55,18 +51,15 @@ void UHookGun::CancelAbility(const FGameplayAbilitySpecHandle Handle, const FGam
 
 	GetWorld()->GetTimerManager().ClearTimer(EndTimerHandle);
 
-	HookGun->GetCableComp()->CableLength = 0.f; // 케이블 기본길이
-
-	//HookGun->GetCableComp()->bAttachEnd = false;
-	HookGun->GetCableComp()->EndLocation = FVector(0);
+	HookGun->GetCableComp()->CableLength = 0.f; 
+		HookGun->GetCableComp()->EndLocation = FVector(0);
 
 	Super::CancelAbility(Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility);
 }
 
 void UHookGun::FireHook()
 {
-	if (!this->IsActive()) return; // 어빌리티 실행중일때만 진입
-
+	if (!this->IsActive()) return; 
 	ACHookGun* HookGun = Cast<ACHookGun>(GetOwningActorFromActorInfo());
 	CheckNull(HookGun);
 
@@ -99,8 +92,7 @@ void UHookGun::FireHook()
 	}
     else
 	{
-		HookGun->GetCableComp()->EndLocation = HookGun->GetTransform().InverseTransformPosition(End); // 로컬 스페이스로 변환
-        HookGun->GetCableComp()->CableLength += 200.f;
+		HookGun->GetCableComp()->EndLocation = HookGun->GetTransform().InverseTransformPosition(End);         HookGun->GetCableComp()->CableLength += 200.f;
     }
 }
 

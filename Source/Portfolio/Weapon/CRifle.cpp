@@ -105,8 +105,7 @@ void ACRifle::Shooting_Implementation()
 
 	Player->GetPlayerWidget()->UpdateCurrentBullet(CurrentBullet);
 
-	// CurrentBullet = FMath::Clamp(CurrentBullet, 0, 30);
-}
+	}
 
 void ACRifle::Reloading_Implementation()
 {

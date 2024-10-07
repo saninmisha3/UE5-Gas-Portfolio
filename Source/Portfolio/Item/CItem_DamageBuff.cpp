@@ -36,8 +36,7 @@ void ACItem_DamageBuff::BeginOverlap(UPrimitiveComponent* OverlappedComponent, A
 	ACPlayer* Player = Cast<ACPlayer>(OtherActor);
 	CheckNull(Player);
 
-	// Player->OnBuff();
-
+	
 	ACWeapon** Weapons = Player->GetEquipment()->GetEquipWeapons();
 	CheckNull(Weapons);
 	

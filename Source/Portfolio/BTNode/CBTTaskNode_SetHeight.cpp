@@ -27,11 +27,9 @@ EBTNodeResult::Type UCBTTaskNode_SetHeight::ExecuteTask(UBehaviorTreeComponent& 
 	UCAnimInstance* Anim = Cast<UCAnimInstance>(Boss->GetMesh()->GetAnimInstance());
 	CheckNullResult(Anim, EBTNodeResult::Failed);
 
-	if (!Anim->IsFly) // 지면에 있으면 
-	{
+	if (!Anim->IsFly) 	{
 		Boss->GetFloatingComp()->Activate();
-		Boss->GetCharacterMovement()->Deactivate(); // 캐릭터 무브먼트를 비활성해 플로팅폰 무브먼트만 사용.
-		Boss->PlayAnimMontage(Boss->GetBossDataAsset()->MontageDatas.TakeOffMontage);
+		Boss->GetCharacterMovement()->Deactivate(); 		Boss->PlayAnimMontage(Boss->GetBossDataAsset()->MontageDatas.TakeOffMontage);
 	}
 	else
 	{
@@ -58,8 +56,7 @@ void UCBTTaskNode_SetHeight::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* 
 	{
 		if (!Boss->GetCurrentMontage())
 		{
-			Anim->IsFly = true; // ABP와 연동.
-			FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+			Anim->IsFly = true; 			FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 		}
 		else
 			Boss->GetFloatingComp()->AddInputVector(FVector(0, 0, 1));
@@ -68,8 +65,7 @@ void UCBTTaskNode_SetHeight::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* 
 	{
 		if (!Boss->GetCurrentMontage() || !Boss->GetFloatingComp()->IsFlying())
 		{
-			Anim->IsFly = false; // ABP와 연동.
-			Boss->StopAnimMontage();
+			Anim->IsFly = false; 			Boss->StopAnimMontage();
 			Boss->GetFloatingComp()->Deactivate();
 			Boss->GetCharacterMovement()->Activate();
 			FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);

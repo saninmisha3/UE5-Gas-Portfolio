@@ -29,8 +29,7 @@ ACPetController::ACPetController()
 
 	PerceptionComp->ConfigureSense(*Sight);
 
-	TeamId = 0; // 플레이어랑 같은 소속
-}
+	TeamId = 0; }
 
 void ACPetController::BeginPlay()
 {
@@ -78,8 +77,7 @@ void ACPetController::OnPerceptionUpdated(const TArray<AActor*>& UpdatedActors)
 	{
 		if (Actor->IsA<ACEnemy>())
 		{
-			Enemy = Cast<ACEnemy>(Actor); // 나중에 여기서 우선순위 같은거 매겨보자
-		}
+			Enemy = Cast<ACEnemy>(Actor); 		}
 		if (Actor->IsA<ACPlayer>())
 		{
 			Player = Cast<ACPlayer>(Actor);

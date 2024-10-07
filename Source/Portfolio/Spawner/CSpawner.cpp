@@ -30,8 +30,7 @@ void ACSpawner::Tick(float DeltaTime)
 
 void ACSpawner::Spawn(FVector PlayerLocation, FName PlayerArea)
 {
-	for (int32 i = 0; i < Number; i++) // 소환할 마릿수 만큼 반복
-	{
+	for (int32 i = 0; i < Number; i++) 	{
 		ACEnemyController* EnemyController = GetWorld()->SpawnActor<ACEnemyController>();
 		CheckNull(EnemyController);
 
@@ -53,21 +52,15 @@ void ACSpawner::Spawn(FVector PlayerLocation, FName PlayerArea)
 
 FVector ACSpawner::SetSpawnRange(FVector PlayerLocation)
 {
-	float Radius = 500.0f; // 예: 반지름 500 유닛 ////////// todo.. 나중에 공개변수로 열 것들
-	float ZRange = 200.0f; // Z 축 범위: -200부터 +200 유닛
+	float Radius = 500.0f; 	float ZRange = 200.0f; 
+		float Angle = FMath::RandRange(0.f, 2 * PI);
 
-	// 랜덤 각도 계산 (0에서 360도 사이)
-	float Angle = FMath::RandRange(0.f, 2 * PI);
-
-	// 원의 반지름 안에서 랜덤한 위치를 계산 (2D 평면에서)
-	float XOffset = Radius * FMath::Cos(Angle);
+		float XOffset = Radius * FMath::Cos(Angle);
 	float YOffset = Radius * FMath::Sin(Angle);
 
-	// Z 값을 랜덤으로 계산 (-ZRange ~ +ZRange)
-	float ZOffset = FMath::RandRange(-ZRange, ZRange);
+		float ZOffset = FMath::RandRange(-ZRange, ZRange);
 
-	// 3D 공간에서 랜덤 위치
-	FVector RandomLocation = PlayerLocation + FVector(XOffset, YOffset, ZOffset);
+		FVector RandomLocation = PlayerLocation + FVector(XOffset, YOffset, ZOffset);
 
 	return RandomLocation;
 }

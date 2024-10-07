@@ -28,8 +28,7 @@ public:
 public:
 	FORCEINLINE virtual UCMonsterMeshDataAsset* GetDataAsset() { return DataAsset; }
 	FORCEINLINE virtual UCEnemyHealthWidget* GetHealthWidget() { return HealthWidgetObject; }
-	FORCEINLINE virtual int32 GetIndex() { return Index; } // ÇÊ¿ä?
-
+	FORCEINLINE virtual int32 GetIndex() { return Index; } 
 	virtual UBoxComponent* GetAttackComp() override { return AttackComp; }
 	
 public:

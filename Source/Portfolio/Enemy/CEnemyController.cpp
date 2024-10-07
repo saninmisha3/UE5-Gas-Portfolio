@@ -76,11 +76,9 @@ void ACEnemyController::OnPossess(APawn* InPawn)
 
 		Sight->SightRadius = 2000.f;
 		Sight->LoseSightRadius = 2500.f;
-		Sight->PeripheralVisionAngleDegrees = 180.f; // z축이 너무 차이가 나서 시야감지가 안됨..
-
+		Sight->PeripheralVisionAngleDegrees = 180.f; 
 		Hear->HearingRange = 8000.f;
-		Hear->LoSHearingRange = 10000.f; // 얘는 z축이 괜찮네?
-	}
+		Hear->LoSHearingRange = 10000.f; 	}
 
 	PerceptionComp->OnPerceptionUpdated.AddDynamic(this, &ACEnemyController::OnPerceptionUpdated);
 	SetGenericTeamId(TeamId);

@@ -37,8 +37,7 @@ void UCPlayerWidget::UpdateHealthBar(float Health)
 {
 	if (PlayerHealthBar)
 	{
-		PlayerHealthBar->SetPercent(Health / 100.f);  // 0 ~ 100 사이로 비율 계산
-		UpdateHealthText(Health);
+		PlayerHealthBar->SetPercent(Health / 100.f);  		UpdateHealthText(Health);
 	}
 }
 
@@ -46,8 +45,7 @@ void UCPlayerWidget::UpdateStaminaBar(float Stamina)
 {
 	if (PlayerStaminaBar)
 	{
-		PlayerStaminaBar->SetPercent(Stamina / 100.f);  // 0 ~ 100 사이로 비율 계산
-		UpdateStaminaText(Stamina);
+		PlayerStaminaBar->SetPercent(Stamina / 100.f);  		UpdateStaminaText(Stamina);
 	}
 }
 
@@ -92,8 +90,7 @@ void UCPlayerWidget::UpdateEquipWeaponImage(UTexture* WeaponImage)
 void UCPlayerWidget::UpdateEquipWeaponProficiency(float Proficiency)
 {
 	if(ProficiencyBar)
-		ProficiencyBar->SetPercent(Proficiency / 100); // TODO.. 이거 하드코딩 손봐야함
-}
+		ProficiencyBar->SetPercent(Proficiency / 100); }
 
 void UCPlayerWidget::UpdateCurrentBullet(float Value)
 {

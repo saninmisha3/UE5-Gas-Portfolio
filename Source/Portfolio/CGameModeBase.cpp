@@ -11,8 +11,7 @@ ACGameModeBase::ACGameModeBase()
 {
 	UAbilitySystemGlobals::Get().InitGlobalData();
 
-	// Set DefaultPawnClass
-	TSubclassOf<ACPlayer> PlayerClass;
+		TSubclassOf<ACPlayer> PlayerClass;
 	CHelpers::GetClass(&PlayerClass, "/Game/Player/BP_CPlayer");
 	CheckNull(PlayerClass);
 
@@ -46,8 +45,7 @@ void ACGameModeBase::BeginPlay()
 	Spawner = GetWorld()->SpawnActor<ACSpawner>(SpawnerClass, SpawnLocation, SpawnRotation);
 	CheckNull(Spawner);
 
-	GetWorld()->GetTimerManager().SetTimer(SpawnTimer, this, &ACGameModeBase::Spawn, 5.f, true); // 5초마다 스폰함수 실행
-
+	GetWorld()->GetTimerManager().SetTimer(SpawnTimer, this, &ACGameModeBase::Spawn, 5.f, true); 
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ATargetPoint::StaticClass(), TargetPointActors);
 
 	for (const auto& Actor : TargetPointActors)
@@ -94,8 +92,7 @@ void ACGameModeBase::Teleport(FName Area)
 	}
 }
 
-void ACGameModeBase::SetPlayerArea(AActor* OtherActor) // 플레이어 지역 바꾸기
-{
+void ACGameModeBase::SetPlayerArea(AActor* OtherActor) {
 	for (const auto& MyTags : OtherActor->Tags)
 		PlayerArea = MyTags;
 

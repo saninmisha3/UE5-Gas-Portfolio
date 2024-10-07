@@ -36,8 +36,7 @@ void UAI_Attack::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const 
 			if(Anim->IsFly)
 				MontageToPlay = Boss->GetBossDataAsset()->MontageDatas.AttackMontage[0];
 			else
-				MontageToPlay = Boss->GetBossDataAsset()->MontageDatas.AttackMontage[1]; // todo.. 나중에 수정해야할수도
-		}
+				MontageToPlay = Boss->GetBossDataAsset()->MontageDatas.AttackMontage[1]; 		}
 		else
 		{
 			ACMonster* Monster = Cast<ACMonster>(OwnerInfo->AvatarActor);

@@ -29,8 +29,7 @@ void ACEquipment::BeginPlay()
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = OwnerCharacter;
 
-	// 스폰시키고 숨기고 필요할때만 보여주는 방식.
-	if (DataAsset->Datas[0].WeaponClass)
+		if (DataAsset->Datas[0].WeaponClass)
 	{
 		EquipWeapon[0] = OwnerCharacter->GetWorld()->SpawnActor<ACWeapon>(DataAsset->Datas[0].WeaponClass, SpawnParams);
 		CheckNull(EquipWeapon[0]);
@@ -115,9 +114,7 @@ void ACEquipment::Equip(int32 slot)
 	else
 		OwnerCharacter->GetPlayerWidget()->ShowCurrentBullet(false);
 
-	// 우클릭 풀어야됨
-	// todo.. 현재 장비해제하면 위젯도 아무것도 없게 만들어야함
-}
+		}
 
 void ACEquipment::Begin_Equip()
 {
@@ -153,8 +150,7 @@ void ACEquipment::OnMainAction()
 
 	CurrentEquipWeapon->GetAbilitySystemComponent()->TryActivateAbility(CurrentEquipWeapon->GetWeaponAbilitySpec().Handle);
 
-	// todo.. 총제외 스테미너 감소
-}
+	}
 
 void ACEquipment::OffMainAction()
 {
@@ -177,8 +173,7 @@ void ACEquipment::OffSubAction()
 {
 	CheckNull(CurrentEquipWeapon);
 	
-	// todo.. 여기 서브능력 진행중인지 아닌지 검사하는 조건 추가해야할듯
-	CurrentEquipWeapon->GetAbilitySystemComponent()->CancelAbilityHandle(CurrentEquipWeapon->GetWeaponSubAbilitySpec().Handle);
+		CurrentEquipWeapon->GetAbilitySystemComponent()->CancelAbilityHandle(CurrentEquipWeapon->GetWeaponSubAbilitySpec().Handle);
 }
 
 void ACEquipment::Reload()
@@ -193,5 +188,4 @@ void ACEquipment::Reload()
 
 void ACEquipment::UpdateProficiency(float NewValue)
 {
-	// OwnerCharacter->
-}
+	}

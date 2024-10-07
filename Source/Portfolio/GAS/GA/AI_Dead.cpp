@@ -106,8 +106,7 @@ void UAI_Dead::Dead(ACharacter* Character)
 		ACBoss* Boss = Cast<ACBoss>(Character);
 		CheckNull(Boss);
 
-		Boss->GetController()->UnPossess(); // 없어야 보스가 떨어지는데 없으면 함수가 여러번 호출됨 
-
+		Boss->GetController()->UnPossess(); 
 		TArray<UShapeComponent*> OutComps;
 		Boss->GetComponents<UShapeComponent>(OutComps);
 

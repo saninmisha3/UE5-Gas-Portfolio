@@ -23,8 +23,7 @@ void UCAIAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribute, 
 	CheckNull(AI);
 
 
-	if (OldValue > NewValue) // 체력이 감소했으면
-	{
+	if (OldValue > NewValue) 	{
 		OnDamaged.Broadcast(OldValue - NewValue);
 
 		if (GetOwningActor()->IsA<ACMonster>())

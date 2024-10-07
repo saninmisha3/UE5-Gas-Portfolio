@@ -8,8 +8,7 @@
 
 void UCAnimNotifyState_Collision::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration, const FAnimNotifyEventReference& EventReference)
 {
-	if (MeshComp->GetOwner()->GetClass()->ImplementsInterface(UCAttackCompInterface::StaticClass())) // 적군
-	{
+	if (MeshComp->GetOwner()->GetClass()->ImplementsInterface(UCAttackCompInterface::StaticClass())) 	{
 		ICAttackCompInterface* Owner = Cast<ICAttackCompInterface>(MeshComp->GetOwner());
 		CheckNull(Owner);
 
@@ -18,8 +17,7 @@ void UCAnimNotifyState_Collision::NotifyBegin(USkeletalMeshComponent* MeshComp, 
 
 		AttackComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	}
-	else // 플레이어
-	{
+	else 	{
 		ACPlayer* Player = Cast<ACPlayer>(MeshComp->GetOwner());
 		CheckNull(Player);
 
@@ -39,8 +37,7 @@ void UCAnimNotifyState_Collision::NotifyBegin(USkeletalMeshComponent* MeshComp, 
 
 void UCAnimNotifyState_Collision::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {
-	if (MeshComp->GetOwner()->GetClass()->ImplementsInterface(UCAttackCompInterface::StaticClass())) // 적군
-	{
+	if (MeshComp->GetOwner()->GetClass()->ImplementsInterface(UCAttackCompInterface::StaticClass())) 	{
 		ICAttackCompInterface* Owner = Cast<ICAttackCompInterface>(MeshComp->GetOwner());
 		CheckNull(Owner);
 
@@ -49,8 +46,7 @@ void UCAnimNotifyState_Collision::NotifyEnd(USkeletalMeshComponent* MeshComp, UA
 
 		AttackComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
-	else // 플레이어
-	{
+	else 	{
 		ACPlayer* Player = Cast<ACPlayer>(MeshComp->GetOwner());
 		CheckNull(Player);
 

@@ -42,13 +42,10 @@ protected:
 		UStaticMeshComponent* MeshComp;
 
 	UPROPERTY(EditDefaultsOnly, Category = "GAS")
-		TObjectPtr<UAbilitySystemComponent> ASC; // ¹öÇÁ ¾ø¾Ù²¨¸é ÀÌ°Íµµ ±»ÀÌ?
-
+		TObjectPtr<UAbilitySystemComponent> ASC; 
 
 protected:
-	UCItemDataAsset* DataAsset; // ÀÖ¾î¾ßµÊ?
-	float Value; // ¹öÇÁ¾ø¾Ù²¨¸é ±»ÀÌ?
-
+	UCItemDataAsset* DataAsset; 	float Value; 
 	UDataTable* DataTable;
 
 	FItemDataTable Row;

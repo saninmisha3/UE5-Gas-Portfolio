@@ -32,8 +32,7 @@ ACMonster::ACMonster()
 	HealthWidgetComp->SetDrawSize(FVector2D(120, 20));
 	HealthWidgetComp->SetWidgetSpace(EWidgetSpace::Screen);
 
-	GetCharacterMovement()->MaxWalkSpeed = 200.f; // 이거 수정해야할지도?
-}
+	GetCharacterMovement()->MaxWalkSpeed = 200.f; }
 
 void ACMonster::BeginPlay()
 {
