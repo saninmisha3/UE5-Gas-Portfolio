@@ -37,11 +37,11 @@ This project showcases the power of **GAS-based ability systems**, advanced **AI
 ---
 
 ## Media Showcase
-![1.](https://github.com/saninmisha3/UE5-Gas-Portfolio/tree/main/AssetMarkdown/1.gif "1.")
-![2.](https://github.com/saninmisha3/UE5-Gas-Portfolio/tree/main/AssetMarkdown/2.gif "2.")
-![3.](https://github.com/saninmisha3/UE5-Gas-Portfolio/tree/main/AssetMarkdown/3.gif "3.")
-![4.](https://github.com/saninmisha3/UE5-Gas-Portfolio/tree/main/AssetMarkdown/4.gif "4.")
-![5.](https://github.com/saninmisha3/UE5-Gas-Portfolio/tree/main/AssetMarkdown/5.gif "5.")
+![1](https://github.com/user-attachments/assets/af84435c-6cf0-40b7-bc20-e4b148642a0f)
+![2](https://github.com/user-attachments/assets/de76a979-5ec3-4907-957e-01571159e31a)
+![3](https://github.com/user-attachments/assets/ac81d018-ab9d-444a-a9f1-2beb1c65c984)
+![4](https://github.com/user-attachments/assets/1310e392-5f33-445a-98a0-c304aa2b5d4d)
+![55](https://github.com/user-attachments/assets/81a6c2e4-9132-4d07-8c4e-6ff19135f735)
 
 ---
 
